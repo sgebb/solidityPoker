@@ -1,0 +1,31 @@
+POkerkontrakt
+
+Vanskelighet: Må ha 52 kort, shuffled, deles ut sånn at bare de som mottar kort kan lese dem
+
+3 personer
+1 starter med liste [1..52]
+Krypter med private key og shuffle
+Send til kontrakten -> kontrakten sier ifra at player2 må hente kortstokken -> 2 henter
+2 har liste[52]med krypterte verdier
+krypter med private key og shuffle
+repeat for player 3
+Alle må ha kryptert, sjekker mot addresselisten.
+
+Dele ut kort
+Har en stokket kortstokk der ingen vet noen av kortene
+For å dekryptere et kort komplett må man ha alle privatnøklene
+Bruk Pohlig-Hellman for alt.
+Det er åpent hvor kortet skal sendes, man får et kort og må dekryptere det.
+
+Når man flipper floppen er det 3 kort som alle må dekryptere, deretter blir den synlig.
+
+Betting blir en payable greie som krever mer enn det de andre har bydd osv.
+
+Decoding: Dk(C) = C^L (mod n)
+where L*K == 1 mod phi(n)
+
+Pohlig-Hellman cipher
+There's a large public prime p (for which the DLOG problem is hard)
+The secret key is an integer x that is relatively prime to p−1
+To encrypt a message M with key x, we compute C=M^x (mod p)
+To decrypt a message C with key x, we compute M=C^((x−1)(mod p−1)) (mod p)
