@@ -29,3 +29,14 @@ There's a large public prime p (for which the DLOG problem is hard)
 The secret key is an integer x that is relatively prime to p−1
 To encrypt a message M with key x, we compute C=M^x (mod p)
 To decrypt a message C with key x, we compute M=C^((x−1)(mod p−1)) (mod p)
+
+
+Noe som ikke helt funker:
+
+ (a = 1 = x)
+Kortstokken er [a,b,c]
+Snorre gjør den til [1,2,3] og shuffler [3,2,1]
+Pat gjør den til [z,y,x] og shuffler [y, z, x].
+
+Pat har lyst på kort x, men Snorre vet ikke hvilket kort X var hos seg, får ikke dekryptert akkurat det kortet.
+Hvordan skal Pat be det uten å dele mappingen sin
