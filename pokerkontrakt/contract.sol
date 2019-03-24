@@ -1,105 +1,97 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.6;
 
 contract PokerGame{
-    
-uint reqDeposit = 10;
-address[10] table;
+
+//table    
+address[2] table;
+mapping(address => uint) indexOf;
+
+//shuffling
 mapping(address => bool) shuffled;
-address dealer = 0;
-uint encrStartedTime;
+uint[3] encrDeck;
+address shuffleResponsible;
 
-uint[52] encrDeck;
+//game
+address dealer = address(0);
+bool openTable = true;
 
-event WaitingForShuffles(
-    string shuffleString
-);
 
-function SignUp(uint16 spot) public payable returns (uint16){
-    require(msg.value == reqDeposit, "You need to pay a deposit to be able to play");
-    require(spot < 10, "Need to provide an open spot between 1 and 9");
-    if(table[spot] == 0){
+//event
+event TimeToShuffle(address nextShuffler);
+event PlayerJoined(address player);
+event PlayerLeft(address player);
+event NeedDecryption(address player, uint16 index);
+
+function Join(uint8 spot) public payable{
+    //take deposit
+    require(spot < 2, "Need to provide an open spot between 0 and 1");
+    require(openTable, "Can't join in the middle of a game");
+    if(table[spot] == address(0)){
         table[spot] = msg.sender;
-        if(dealer == 0){
+        indexOf[msg.sender] = spot;
+
+        if(dealer == address(0)){
             dealer = msg.sender;
+            shuffleResponsible = msg.sender;
         }
-        return spot;
-    }
-    else{
-        return 0;
+        emit PlayerJoined(msg.sender);
     }
 }
 
-
-function FirstEncr(uint[52] firstEncr) public {
-    require(msg.sender == dealer);
-    encrDeck = firstEncr;
-    encrStartedTime = now;
-    
-    emit WaitingForShuffles("Still waiting for all players to encrypt and shuffle deck");
+function Leave() public {
+    require(indexOf[msg.sender] != 0, "You're not in the game");
+    if(msg.sender == dealer){
+        dealer = address(0);
+    }
+    delete table[indexOf[msg.sender]];
+    indexOf[msg.sender] = 0;
+    emit PlayerLeft(msg.sender);
+    //refund deposit
 }
 
-function ForceStart(){
-    if(now > encrStartedTime + 1 minutes){
-        KickUnshuffled();
+
+function Shuffle(uint[3] memory encryptedCards) public {
+    require(msg.sender == shuffleResponsible, "Not your turn to shuffle");
+    encrDeck = encryptedCards;
+    shuffled[msg.sender] = true;
+    shuffleResponsible = table[indexOf[msg.sender]+1]; //cycle through (but without bugs eventually)
+    if(AllEncrypted()){
+        openTable = false;
         StartGame();
     }
-}
-
-function KickUnshuffled() private{
-    for(uint16 i=0; i<10; i++){
-        if(table[i] == 0){
-            continue;
-        }
-        if(!shuffled[table[i]]){
-            table[i] = 0; //should refund deposit and all that
-        }
+    else{
+        emit TimeToShuffle(shuffleResponsible); 
     }
 }
 
-function CheckShuffled() public view returns (bool) {
-    return shuffled[msg.sender];
-}
 
-function EncryptAndShuffle(uint[52] newDeck) public {
-    require(IsInGame(msg.sender));
-    encrDeck = newDeck;
-    
-    StartIfAllEncrypted();
-}
-
-function StartIfAllEncrypted() private {
-    for(uint16 i=0; i<10; i++){
-        if(table[i]== 0){
+function AllEncrypted() private view returns(bool){
+    for(uint8 i=0; i<2; i++){
+        if(table[i]== address(0)){
             continue;
         }
         if(shuffled[table[i]] == false) {
-            emit WaitingForShuffles("At least one player has not shuffled");
-            return;
+            return false;
         }
+        return true;
     }
-    StartGame();
 }
+
 
 function StartGame() private {
     
 }
 
-function IsInGame(address addr) private view returns (bool){
-    for(uint16 i; i<10; i++){
-        if(table[i] == addr){
-            return true;
-        }
-    }
-    return false;
+function EndGame() private {
+    openTable = true;
 }
 
 
-
-function CheckTable() public view returns (address[10]){
+function CheckTable() public view returns (address[2] memory) {
     return table;
 }
 
-function CheckDealer() public view returns (address) {
-    return dealer;
+function Deck() public view returns (uint[3] memory){
+    return encrDeck;
 }
 }
