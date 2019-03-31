@@ -39,4 +39,5 @@ Snorre gjør den til [1,2,3] og shuffler [3,2,1]
 Pat gjør den til [z,y,x] og shuffler [y, z, x].
 
 Pat har lyst på kort x, men Snorre vet ikke hvilket kort X var hos seg, får ikke dekryptert akkurat det kortet.
-Hvordan skal Pat be det uten å dele mappingen sin
+Hvordan skal Pat be det uten å dele mappingen sin.
+1. Funker av seg selv hvis man bruker samme kryptering på hvert av kortene, blir det dårligere sikkerhet av det? Spørs vel på algoritmen, men utfallsrommet er det som dikterer hvor bra det er. Må bruke bits
